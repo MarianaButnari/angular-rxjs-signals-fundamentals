@@ -1,6 +1,6 @@
 import {inject, Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {map, Observable, of, switchMap, tap} from "rxjs";
+import {catchError, map, Observable, of, shareReplay, switchMap, tap} from "rxjs";
 import {Product} from "./product";
 import {ReviewService} from "../reviews/review.service";
 import {Review} from "../reviews/review";
@@ -13,12 +13,22 @@ export class ProductService {
   private httpClient = inject(HttpClient);
   private reviewService = inject(ReviewService);
 
+  // DECLARATIVE
+  readonly products$ = this.httpClient.get<Product[]>(this.productsUrl).pipe(
+    tap(data => console.log(JSON.stringify(data))),
+    shareReplay(1),
+    catchError(err => {
+      console.log(err);
+      return of(err);
+    }))
+
+  // PROCEDURAL
   getProducts(): Observable<Product[]> {
     return this.httpClient.get<Product[]>(this.productsUrl).pipe(
       tap(data => console.log(data))
     )
   }
-
+  // DECLARATIVE
   getProduct(id: number): Observable<Product> {
     return this.httpClient.get<Product>(`${this.productsUrl}/${id}`).pipe(
       tap(data => console.log(data)),
