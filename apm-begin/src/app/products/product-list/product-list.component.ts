@@ -13,6 +13,7 @@ import {catchError, EMPTY, Subscription, tap} from "rxjs";
   imports: [NgIf, NgFor, NgClass, ProductDetailComponent, AsyncPipe]
 })
 export class ProductListComponent implements OnInit, OnDestroy{
+  private productService = inject(ProductService)
   // Just enough here for the template to compile
   pageTitle = 'Products';
   errorMessage = '';
@@ -21,10 +22,10 @@ export class ProductListComponent implements OnInit, OnDestroy{
   // products: Product[] = [];
 
   // Selected product id to highlight the entry
-  selectedProductId: number = 0;
+  // selectedProductId: number = 0;
+  readonly selectedProductId$ = this.productService.productSelected$
   // am avut nevoie de subscription cind foloseam modul procedural, in caz ca folosim declarativ nu avem nevoie de OnInit si OnDestroy
   // private subscription!: Subscription;
-  private productService = inject(ProductService)
   readonly products$ = this.productService.products$.pipe(
     tap(data => console.log('COMPONENT', data)),
     catchError(err => {
@@ -32,6 +33,7 @@ export class ProductListComponent implements OnInit, OnDestroy{
       return EMPTY
     })
   );
+
 
   ngOnInit(): void {
     // this.subscription = this.productService.getProducts().subscribe(data => this.products = data);
@@ -41,7 +43,8 @@ export class ProductListComponent implements OnInit, OnDestroy{
     // this.subscription.unsubscribe();
   }
   onSelected(productId: number): void {
-    this.selectedProductId = productId;
+    // this.selectedProductId = productId;
+    this.productService.productSelected(productId);
   }
 
 }
