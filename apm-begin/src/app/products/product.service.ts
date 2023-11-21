@@ -26,6 +26,9 @@ export class ProductService {
   private reviewService = inject(ReviewService);
   readonly productSelected$ = this.productSelectedSubject.asObservable();
 
+  productSelected(selectedProductId: number): void {
+    this.productSelectedSubject.next(selectedProductId);
+  }
   // DECLARATIVE
   readonly products$ = this.httpClient.get<Product[]>(this.productsUrl).pipe(
     tap(data => console.log(JSON.stringify(data))),
@@ -60,6 +63,7 @@ export class ProductService {
     map(([selectedProductID, products]) => {
      return  products.find((product: Product) => product.id === selectedProductID)
     }),
+    //filter out null and undefined
     filter(Boolean),
     switchMap((product: Product) => this.getProductWithReview(product)),
   )
@@ -69,10 +73,6 @@ export class ProductService {
       tap(data => console.log(data)),
       switchMap(product => this.getProductWithReview(product)),
       tap(x => console.log(x)))
-  }
-
-  productSelected(selectedProductId: number): void {
-    this.productSelectedSubject.next(selectedProductId);
   }
 
   private getProductWithReview(product: Product): Observable<Product> {
