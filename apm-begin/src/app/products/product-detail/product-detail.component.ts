@@ -1,4 +1,4 @@
-import {Component, inject, Input, OnChanges, OnDestroy, SimpleChanges} from '@angular/core';
+import {Component, computed, inject, Input, OnChanges, OnDestroy, SimpleChanges} from '@angular/core';
 
 import {NgIf, NgFor, CurrencyPipe, AsyncPipe} from '@angular/common';
 import { Product } from '../product';
@@ -17,19 +17,29 @@ export class ProductDetailComponent implements OnChanges, OnDestroy{
   private productService = inject(ProductService);
   private cartService = inject(CartService);
   // @Input() productId!: number;
-  errorMessage = '';
+  // errorMessage = '';
   // Product to display
   // product!: Product;
-  readonly product$ = this.productService.product2$.pipe(
-    tap(data => console.log('COMPONENT', data)),
-    catchError(err => {
-      this.errorMessage = err;
-      return EMPTY
-    })
-  );
+  // readonly product$ = this.productService.product$.pipe(
+  //   tap(data => console.log('COMPONENT', data)),
+  //   catchError(err => {
+  //     this.errorMessage = err;
+  //     return EMPTY
+  //   })
+  // );
+  product = this.productService.product;
+  errorMessage = this.productService.productError;
+
   // Set the page title
   // pageTitle = this.product ? `Product Detail for: ${this.product.productName}` : 'Product Detail';
-  pageTitle = 'Product Detail';
+  pageTitle = computed(() =>
+      this.product()
+        ? `Product Detail for: ${this.product()?.productName}`
+        : 'Product Detail'
+    // TODO TO AVOID TYPE NARROWING WITH OBJECTS WE CAN DO:
+    // const productS = this.product();
+    // productS ?`Product Detail for: ${productS.productName}` : 'Product Detail'
+  )
   ngOnChanges(changes: SimpleChanges): void {
     // const currentId = changes['productId'].currentValue;
     // this.subscription = this.productService.getProduct(currentId).subscribe(data => this.product = data)

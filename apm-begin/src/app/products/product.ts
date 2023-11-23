@@ -11,3 +11,9 @@ export interface Product {
   hasReviews?: boolean;
   reviews?: Review[];
 }
+
+// this should be in a separate file called utility
+export interface ResponseResult<T> {
+  data: T | undefined;
+  error?: string
+}
